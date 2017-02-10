@@ -110,7 +110,7 @@ class SlitSpectra:
         self.full_base_vs_transfer_fit = None
         self.trim_base_vs_transfer_fit = None
 
-    def freakout(self):
+    def zen(self):
         import this
         print self.image, 'will not win forever.'
         del this
@@ -904,7 +904,142 @@ class SlitSpectra:
             filenameend = '_x'+str(x[0])+':'+str(x[1])+'.jpg'
             fig.savefig(directory+self.image+'_spectraplot'+filenameend,bbox_inches='tight')
             del os
-                          
+            
+            
+    def buildSpectra(self,verbose=False):
+        """
+        Builds self.spectra for specific wavelength.
+        
+        Parameters
+        ----------
+        verbose : boolian 
+            to print True or False
+        """
+        from astropy.io import fits
+ 
+        def wavelength(pixel,w1,dw):
+            wave = w1 + (pixel-1)*dw
+            return wave
+        
+        self.spectra = {}
+        for i in range(1,self.n_apertures+1):
+            open_image = fits.open(self.path+self.image+'.{:04}'.format(i)+'.fits')
+            if verbose:
+                print open_image.info()
+            
+            image_data = open_image[0].data
+            self.spectra[i] = image_data
+            open_image.close()
+
+            image_data = self.spectra[i]
+            
+            if self.direction == 0:
+                self.n_pix = len(image_data[1][0])
+            else:
+                self.n_pix = len(image_data)
+                
+            x_pix = np.linspace(1,self.n_pix,self.n_pix)
+            x_wav = wavelength(x_pix,self.w1,self.dw)
+            if self.direction == 0:
+                y_val = image_data[1][0]
+            else:
+                y_val = image_data
+            
+            if verbose:
+                print 'x pixels:     ', self.n_pix
+                print 'x wavelengths:', x_wav[0],x_wav[-1]
+        del fits
+           
+    def plotWavelengthSpectra(self,wavename1,wavename2=None,x=None,baseline=None,verbose=False,save_fig=False):
+
+        import matplotlib.pyplot as plt
+        from astropy.visualization import astropy_mpl_style
+        plt.style.use(astropy_mpl_style)
+        from scipy import stats
+        
+        directory = self.path+'/plots/'
+
+        def waveInt(wavename):
+            n=self.wavelength_names.index(wavename)
+            return n+1
+
+        n = waveInt(wavename1)
+        m = None
+        if wavename2 != None:
+            m = waveInt(wavename2)
+
+        n_plots = 1
+
+        fig, ax = plt.subplots(n_plots,1)
+        fig.set_size_inches(15,5*(n_plots))
+
+        if n_plots == 1:
+            axall = ax
+        else:
+            axall = ax[n_plots]
+
+        x_pix = np.linspace(1,self.n_pix,self.n_pix)
+
+        if m == None:
+            axall.plot(x_pix, self.spectra[n], linewidth=.5,c='r')
+            spectra_n_min = self.spectra[n].min()
+            spectra_n_mode = stats.mode(self.spectra[n])[0][0]
+            spectra_n_mean = np.mean(self.spectra[n])
+            sum_over_3 = (spectra_n_min+spectra_n_mode+spectra_n_mean)/3
+            
+            if verbose:
+                print 'min:  ',spectra_n_min
+                print 'mode: ',spectra_n_mode
+                print 'mean: ',spectra_n_mean
+                print 'sum/3:',sum_over_3
+                
+            axall.plot(x_pix,[spectra_n_min for x_pix_int in x_pix],'b',alpha=.2,label='min')
+            axall.plot(x_pix,[spectra_n_mode for x_pix_int in x_pix],'g',alpha=.2,label='mode')
+            axall.plot(x_pix,[spectra_n_mean for x_pix_int in x_pix],'m',alpha=.2,label='mean')
+            axall.plot(x_pix,[sum_over_3 for x_pix_int in x_pix],'k',alpha=.2,label='min+mode+mean/3')
+            
+#GO HERE
+            if x == None:
+                x = [x_pix.min(),x_pix.max()]
+
+            axall.set_xlim(x[0],x[1])
+            axall.set_title(self.image)
+            axall.set_ylabel(self.wavelength_names[n-1])
+            axall.set_xlabel('Pixel')
+            
+            axall.legend(loc=0,bbox_to_anchor=(1,1));
+            
+            filenametosave = directory+self.image+'_linespectra_'+str(wavename1)+'.jpg'
+            
+        if m != None:
+            if baseline==None:
+                baseline = [self.spectra[n].min(),self.spectra[m].min()]
+                
+            y = (self.spectra[n]-baseline[0])/(self.spectra[m]-baseline[1])
+            axall.plot(x_pix, y, linewidth=.5)
+
+            if x == None:
+                x = [x_pix.min(),x_pix.max()]    #could be done much better; also fix i vs. i-1
+
+            axall.set_xlim(x[0],x[1])
+            axall.set_title(self.image)
+            axall.set_ylabel(self.wavelength_names[n-1] + ' / ' + self.wavelength_names[m-1])
+            axall.set_xlabel('Pixel')
+            
+            filenametosave = directory+self.image+'_linespectra_'+str(wavename1)+'_per_'+str(wavename2)+'.jpg'
+        
+        del stats
+        del plt
+        
+        if save_fig:
+            import os
+            directory = self.path+'/plots/'
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+            fig.savefig(filenametosave, bbox_inches='tight')
+            del os
+
+            
     def finalizeFiles(self,t=None,verbose=True):
         
         """
