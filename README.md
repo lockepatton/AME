@@ -102,9 +102,10 @@ Once your profiles + spectra have been extracted
 Plotting images
 ---------
 
-The main command to plot images is plotImageWavelength::        
-        T.plotImageWavelength(save_fig=True,verbose=False)
-        T.plotImageWavelength(x=[250,700],save_fig=True,verbose=False)
+The main command to plot images is plotImageWavelength::  
+
+    T.plotImageWavelength(save_fig=True,verbose=False)
+    T.plotImageWavelength(x=[250,700],save_fig=True,verbose=False)
 
 All line profiles that have been defined using T.calculateWavelengths will be added to the plot too, so you can check alignment between where you are extracting (and if you're using them their background regions).
 
@@ -113,7 +114,8 @@ Plotting line profiles
 ---------
 
 It's easy to plot line profiles::
-        T.plotSpectra(save_fig=False, verbose=False)
+
+    T.plotSpectra(save_fig=False, verbose=False)
 
 Typical full usage often looks like this - note that line profiles must have already been extracted as seen above (or via your own method)::
 
