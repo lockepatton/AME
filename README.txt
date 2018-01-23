@@ -13,34 +13,34 @@ Example setup
 =========
 Typical set-up often looks like this::
 
-      #!/usr/bin/env python
-      from AME import SlitSpectra as SS
+        #!/usr/bin/env python
+        from AME import SlitSpectra as SS
 
-      image = "filename"      #image file name
-      dir_ = 'path/to/file/'  #path to image name
-      full_region = [1,2098,1,1078]n  #image region dimensions of image before trimming
-      center_width = 10       #width of center extraction (code automatically creates center extraction)
+        image = "filename"      #image file name
+        dir_ = 'path/to/file/'  #path to image name
+        full_region = [1,2098,1,1078]n  #image region dimensions of image before trimming
+        center_width = 10       #width of center extraction (code automatically creates center extraction)
 
-      trim_region = [15,1920,99,819]  #trimming region dimensions of image
-      full_lowest = 83.5      #lowest pixel in y that data is found
-      full_highest = 834.5    #highest pixel in y that data is found
+        trim_region = [15,1920,99,819]  #trimming region dimensions of image
+        full_lowest = 83.5      #lowest pixel in y that data is found
+        full_highest = 834.5    #highest pixel in y that data is found
 
-      w1 =  2906.903          #starting wavelength  #May 24th Night
-      w2 =  6157.6            #ending wavelength
-      dw =  1.826235          #wavelength interval per pixel
-      nw =  1781              #number of output pixels
+        w1 =  2906.903          #starting wavelength  #May 24th Night
+        w2 =  6157.6            #ending wavelength
+        dw =  1.826235          #wavelength interval per pixel
+        nw =  1781              #number of output pixels
 
-      T = SS(image=image,
-             channel=channel,
-             path=dir_,
-             full_region=full_region,
-             trim_region=trim_region,
-             direction='y',
-             full_lowest=full_lowest,
-             full_highest=full_highest,
-             trace_center=trace_center,
-             SN_width=center_width,
-             w1=w1,w2=w2,dw=dw)
+        T = SS(image=image,
+               channel=channel,
+               path=dir_,
+               full_region=full_region,
+               trim_region=trim_region,
+               direction='y',
+               full_lowest=full_lowest,
+               full_highest=full_highest,
+               trace_center=trace_center,
+               SN_width=center_width,
+               w1=w1,w2=w2,dw=dw)
 
 Once the SlitSpectra (SS) object is built, there are *many* ways to go from there.
 
@@ -87,7 +87,7 @@ Example Complete Extraction on Images with PyRAF's apall
 
 - plotSpectra() plotImage() & plotImageWavelength() & plotWavelengthSpectra() can be used to see your data quickly, especially when working with many files at once
 
-###### Step 6 finalizeFiles()
+###### Step 6 - finalizeFiles()
 - Finalize files will copy all related files and add any necessary info (including date, time, profile names, etc) to the file names. This way you know exactly when and where and what your files where when you come back to them.
 - Make sure to copy your plots into the dated finalized directory, if you want them there too.
 
@@ -102,10 +102,10 @@ Once your profiles + spectra have been extracted
 Plotting images
 ---------
 
-The main command to plot images is plotImageWavelength::  
+The main command to plot images is plotImageWavelength::
 
-    T.plotImageWavelength(save_fig=True,verbose=False)
-    T.plotImageWavelength(x=[250,700],save_fig=True,verbose=False)
+        T.plotImageWavelength(save_fig=True,verbose=False)
+        T.plotImageWavelength(x=[250,700],save_fig=True,verbose=False)
 
 All line profiles that have been defined using T.calculateWavelengths will be added to the plot too, so you can check alignment between where you are extracting (and if you're using them their background regions).
 
@@ -115,33 +115,33 @@ Plotting line profiles
 
 It's easy to plot line profiles::
 
-    T.plotSpectra(save_fig=False, verbose=False)
+        T.plotSpectra(save_fig=False, verbose=False)
 
 Typical full usage often looks like this - note that line profiles must have already been extracted as seen above (or via your own method)::
 
-    wavelengths = [6300, 6548, 6563, 6584, 6717, 6731]     #red wavelength values in Angstroms
-    wavelength_names = [r'[OI]6300weak', r'[NII]6548',
-                        r'Halpha6563*', r'[NII]6584weak',
-                        r'[SII]6717', r'[SII]6731']
-    wavelength_widths = [6,6,6,6,6,6]
+        wavelengths = [6300, 6548, 6563, 6584, 6717, 6731]     #red wavelength values in Angstroms
+        wavelength_names = [r'[OI]6300weak', r'[NII]6548',
+                            r'Halpha6563*', r'[NII]6584weak',
+                            r'[SII]6717', r'[SII]6731']
+        wavelength_widths = [6,6,6,6,6,6]
 
-    pixel_backgrounds = []
+        pixel_backgrounds = []
 
-    it_ = 0
-    while it_ < len(wavelengths):
-        pixel_backgrounds.append([-7,-5,5,7])
-        it_ = it_ + 1
+        it_ = 0
+        while it_ < len(wavelengths):
+            pixel_backgrounds.append([-7,-5,5,7])
+            it_ = it_ + 1
 
-    T.calculateWavelengths(wavelength_names=wavelength_names,
-                           wavelengths=wavelengths, pixel_widths=wavelength_widths,
-                           pixel_backgrounds=pixel_backgrounds)
+        T.calculateWavelengths(wavelength_names=wavelength_names,
+                               wavelengths=wavelengths, pixel_widths=wavelength_widths,
+                               pixel_backgrounds=pixel_backgrounds)
 
-    if plotSpec:
-        T.plotSpectra(save_fig=False, verbose=False)
-        T.plotImageWavelength(save_fig=True, verbose=False, blackout=False,vmin=0, vmax=1.7e-15)
-        T.plotImageWavelength(save_fig=True, verbose=False, blackout=False,vmin=0, vmax=1.7e-15, x=[300,600])
+        if plotSpec:
+            T.plotSpectra(save_fig=False, verbose=False)
+            T.plotImageWavelength(save_fig=True, verbose=False, blackout=False,vmin=0, vmax=1.7e-15)
+            T.plotImageWavelength(save_fig=True, verbose=False, blackout=False,vmin=0, vmax=1.7e-15, x=[300,600])
 
-    T.buildSpectra(verbose=verbose)
+        T.buildSpectra(verbose=verbose)
 
 
 Returning your spectra / line profile data
@@ -149,17 +149,22 @@ Returning your spectra / line profile data
 
 Once you've set-up your object and run T.buildSpectra, you can return line profiles / spectra. This process is shown here::
 
-    returnsAllSpec = T.returnAllSpectra()
-    [x_pix, SpectraAll] = returnsAllSpec
+        returnsAllSpec = T.returnAllSpectra()
+        [x_pix, SpectraAll] = returnsAllSpec
 
-    Halpha_profile = SpectraAll['Halpha6563*']
-    NII_profile = SpectraAll['[NII]6584weak']  #etc
+        Halpha_profile = SpectraAll['Halpha6563*']
+        NII_profile = SpectraAll['[NII]6584weak']  #etc
 
 
 If you'd like to return min-subtracted data, you can also pull that functionality out of T.plotWavelengthSpectra::
 
-    returns = T.plotWavelengthSpectra('[NII]6584weak','Halpha6563*',x=None, minSubtract=False,
-                                      verbose=False,returned=True,save_fig=True)
+        returns = T.plotWavelengthSpectra('[NII]6584weak','Halpha6563*',x=None, minSubtract=False,
+                                          verbose=False,returned=True,save_fig=True)
 
-    [x_pix, [y_NII6584_min_sub, y_NII6584_true, wavelength_NII6584], \
-            [y_Halpha6563_min_sub, y_Halpha6563_true, wavelength_Halpha6563]] = returns
+        [x_pix, [y_NII6584_min_sub, y_NII6584_true, wavelength_NII6584], \
+                [y_Halpha6563_min_sub, y_Halpha6563_true, wavelength_Halpha6563]] = returns
+
+
+
+
+Setup using : http://the-hitchhikers-guide-to-packaging.readthedocs.io/en/latest/creation.html
